@@ -15,7 +15,7 @@ index c5a3001..e1bd97b 100644
 -
 +		/* read prompt from DOAS_PROMPT env var*/
 +		const char *prompt_env = getenv("DOAS_PROMPT");
-+        snprintf(doas_prompt, sizeof(doas_prompt), "\r%s", prompt_env);
++        snprintf(doas_prompt, sizeof(doas_prompt), "\r%b", prompt_env);
  		/* authenticate */
  		ret = pam_authenticate(pamh, 0);
  		if (ret != PAM_SUCCESS) {
@@ -43,7 +43,7 @@ index 71c71c6..dd5ee10 100644
 -			"\rdoas (%.32s@%.32s) password: ", myname, host);
 +    /* read prompt from env var */
 +	const char *prompt_env = getenv("DOAS_PROMPT");
-+    snprintf(cbuf, sizeof(cbuf), "\r%s", prompt_env);
++    snprintf(cbuf, sizeof(cbuf), "\r%b", prompt_env);
 +	
  	challenge = cbuf;
  
