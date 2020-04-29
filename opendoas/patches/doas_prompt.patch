@@ -1,0 +1,50 @@
+diff --git a/pam.c b/pam.c
+index c5a3001..e1bd97b 100644
+--- a/pam.c
++++ b/pam.c
+@@ -271,13 +271,9 @@ pamauth(const char *user, const char *myname, int interactive, int nopass, int p
+ 		if (!interactive)
+ 			errx(1, "Authorization required");
+ 
+-		/* doas style prompt for pam */
+-		char host[HOST_NAME_MAX + 1];
+-		if (gethostname(host, sizeof(host)))
+-			snprintf(host, sizeof(host), "?");
+-		snprintf(doas_prompt, sizeof(doas_prompt),
+-		    "\rdoas (%.32s@%.32s) password: ", myname, host);
+-
++		/* read prompt from DOAS_PROMPT env var*/
++		const char *prompt_env = getenv("DOAS_PROMPT");
++        snprintf(doas_prompt, sizeof(doas_prompt), "\r%s", prompt_env);
+ 		/* authenticate */
+ 		ret = pam_authenticate(pamh, 0);
+ 		if (ret != PAM_SUCCESS) {
+diff --git a/shadow.c b/shadow.c
+index 71c71c6..dd5ee10 100644
+--- a/shadow.c
++++ b/shadow.c
+@@ -15,7 +15,7 @@
+ #include <string.h>
+ #include <syslog.h>
+ #include <unistd.h>
+-
++#include <stdlib.h>
+ #include "openbsd.h"
+ 
+ void
+@@ -51,11 +51,10 @@ shadowauth(const char *myname, int persist)
+ 		errx(1, "Authorization failed");
+ 	}
+ 
+-	char host[HOST_NAME_MAX + 1];
+-	if (gethostname(host, sizeof(host)))
+-		snprintf(host, sizeof(host), "?");
+-	snprintf(cbuf, sizeof(cbuf),
+-			"\rdoas (%.32s@%.32s) password: ", myname, host);
++    /* read prompt from env var */
++	const char *prompt_env = getenv("DOAS_PROMPT");
++    snprintf(cbuf, sizeof(cbuf), "\r%s", prompt_env);
++	
+ 	challenge = cbuf;
+ 
+ 	response = readpassphrase(challenge, rbuf, sizeof(rbuf), RPP_REQUIRE_TTY);
