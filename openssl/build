@@ -1,0 +1,10 @@
+#!/bin/sh
+
+./Configure \
+    --prefix=/usr \
+    --openssldir=/etc/ssl \
+    --libdir=/usr/lib \
+    linux-x86_64
+
+make
+make DESTDIR="$1" MANDIR=/usr/share/man install
